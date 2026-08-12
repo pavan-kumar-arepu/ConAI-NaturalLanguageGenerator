@@ -1,0 +1,51 @@
+%% NLG-focused architecture diagram: linearization → tokenization → seq2seq
+flowchart LR
+  Input["Structured Record\n(schema fields)"]
+  Linearizer["Linearizer\n(field -> text template)"]
+  Tokenizer["Tokenizer / Vocab\n(vocab.json, token_to_id.json)"]
+  Encoded["Token ID Sequences\n(linearized_*.json)"]
+  Model["Model (Transformer Seq2Seq)\nencoder-decoder"]
+  Training["Training Loop\n(loss, optimizer, teacher forcing)"]
+  Checkpoints["Checkpoints / Weights"]
+  Inference["Inference\n(greedy / beam search)"]
+  Output["Generated Text"]
+  Eval["Evaluation\n(BLEU, ROUGE, human)"]
+
+  %% Dataset box
+  subgraph DATASET[dataset/]
+    direction TB
+    TRAIN["train.json"]
+    VAL["validation.json"]
+    TEST["test.json"]
+    LIN_T["linearized_train.json"]
+    LIN_V["linearized_validation.json"]
+    LIN_TE["linearized_test.json"]
+    VOC["vocab.json\ntoken_to_id.json\nid_to_token.json"]
+  end
+
+  %% Core flow
+  Input --> Linearizer --> Tokenizer --> Encoded --> Model
+  Model --> Checkpoints
+  Encoded --> Training --> Model
+  Checkpoints --> Inference --> Output --> Eval
+
+  %% Validation / monitoring
+  VAL --> Linearizer
+  LIN_V --> Encoded
+  LIN_TE --> Encoded
+  Eval --> "Notebook / Reports"
+
+  %% Notes
+  subgraph NOTES[Key design points]
+    direction TB
+    K1["Design: linearize structured data to preserve semantics"]
+    K2["Vocab & token IDs must be saved with checkpoints"]
+    K3["Evaluate with automatic metrics + human review"]
+  end
+
+  NOTES --- Model
+
+  style DATASET fill:#f3f4f6,stroke:#999,stroke-width:1px
+  style Model fill:#fff3cd,stroke:#d6a800,stroke-width:1px
+  style Linearizer fill:#e6f7ff,stroke:#1f78b4,stroke-width:1px
+  style Tokenizer fill:#f0efeb,stroke:#7a5c61,stroke-width:1px

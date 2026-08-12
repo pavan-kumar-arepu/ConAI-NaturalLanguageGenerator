@@ -1,0 +1,26 @@
+flowchart LR
+  U[User / Researcher] --> NB[Notebook: Group_188_PS2_Submission.ipynb]
+  NB --> DL[Data Loader]
+  DL --> P[Preprocessing]
+  P --> L[Linearizer]
+  L --> M[Model (Seq2Seq / Transformer)]
+  M --> O[Output: Generated Text]
+  O --> E[Evaluation / Metrics]
+
+  subgraph Dataset [dataset/]
+    T[train.json]
+    V[validation.json]
+    Te[test.json]
+    LT[linearized_train.json]
+    LV[linearized_validation.json]
+    LTe[linearized_test.json]
+    Vocab[vocab.json \n token_to_id.json \n id_to_token.json]
+  end
+
+  DL --- Dataset
+  NB --> Repo[Repository Files]
+  Repo --> Files[dataset/ \n notebooks/ \n docs/]
+
+  style Dataset fill:#f9f9f2,stroke:#333,stroke-width:1px
+  style NB fill:#eef,stroke:#333,stroke-width:1px
+  style M fill:#ffe8cc,stroke:#333,stroke-width:1px
